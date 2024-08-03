@@ -1,3 +1,5 @@
+import { Model } from 'mongoose';
+
 export interface IUser {
   fullName: string;
   email: string;
@@ -5,7 +7,13 @@ export interface IUser {
   avatar: string;
   password: string;
   wallet: number;
-  role: string;
+  role: 'user' | 'admin';
   isDeleted: boolean;
   isBlocked: boolean;
+  status: 'in-progress' | 'blocked';
+}
+
+// for creating a static
+export interface UserModel extends Model<IUser> {
+  isUserExistsByEmail(email: string): Promise<IUser | null>;
 }
