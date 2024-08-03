@@ -1,0 +1,21 @@
+{
+  "name": "express-mvc-template",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./dist/db.js",
+    "start:dev": "ts-node-dev --respawn --transpile-only src/db.ts",
+    "lint": "eslint src --ignore-path .eslintignore --ext .ts",
+    "lint:fix": "npx eslint src --fix",
+    "prettier": "prettier --ignore-path .gitignore --write \"./src/**/*.+(js|ts|json)\"",
+    "prettier:fix": "npx prettier --write src",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {}
+}
