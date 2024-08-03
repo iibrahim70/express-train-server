@@ -15,7 +15,6 @@ const createUserFromDB = async (payload: IUser) => {
 
   // If user does not exist, create the new user
   const result = User.create(payload);
-
   return result;
 };
 

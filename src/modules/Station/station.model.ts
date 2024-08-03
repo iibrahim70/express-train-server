@@ -1,8 +1,8 @@
 import { Schema, model } from 'mongoose';
-import { IStation } from './station.interface';
+import { IStation, StationModel } from './station.interface';
 
 // Define the schema for the Station model
-const stationSchema = new Schema<IStation>(
+const stationSchema = new Schema<IStation, StationModel>(
   {
     stationName: {
       type: String,
@@ -21,5 +21,14 @@ const stationSchema = new Schema<IStation>(
   { timestamps: true }, // Adds createdAt and updatedAt timestamps
 );
 
+// Static method to check if a station with the given code exists
+stationSchema.statics.isStationExistsByStationCode = async function (
+  stationCode: number,
+) {
+  // Check for a station with the specified stationCode
+  const existingStation = await Station.findOne({ stationCode });
+  return existingStation;
+};
+
 // Create the Station model using the schema
-export const Station = model<IStation>('Station', stationSchema);
+export const Station = model<IStation, StationModel>('Station', stationSchema);
