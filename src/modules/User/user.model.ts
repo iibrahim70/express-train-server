@@ -31,6 +31,7 @@ const userSchema = new Schema<IUser, UserModel>(
     wallet: {
       type: Number,
       required: true,
+      default: 150,
     },
     role: {
       type: String,
