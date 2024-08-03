@@ -9,4 +9,6 @@ export default {
   dbName: process.env.DB_Name,
   nodeEnv: process.env.NODE_ENV,
   bcryptSaltRounds: process.env.BCRYPT_SALT_ROUNDS,
+  jwtAccessSecret: process.env.JWT_ACCESS_SECRET,
+  jwtAccessExpiresIn: process.env.JWT_EXPIRES_IN,
 };
