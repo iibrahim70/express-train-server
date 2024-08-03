@@ -72,7 +72,9 @@ userSchema.methods.toJSON = function () {
   // Remove password and role fields from the user object
   delete userObject?.password;
   delete userObject?.role;
+  delete userObject?.status;
   delete userObject?.isBlocked;
+  delete userObject?.isDeleted;
 
   return userObject;
 };

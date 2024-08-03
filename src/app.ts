@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// default route
+// Default route for the root URL
 app.get('/', (req: Request, res: Response) => {
   const serverStatus = {
     status: 'running',
@@ -18,9 +18,13 @@ app.get('/', (req: Request, res: Response) => {
     timestamp: new Date().toISOString(),
     version: 'v1.0.1',
     uptime: process.uptime(),
-    developedBy: 'Ibrahim Khalil',
+    author: {
+      name: 'Ibrahim Khalil',
+      email: 'iibrahiim.dev@gmail.com',
+      website: 'https://iibrahim-dev.netlify.app/',
+    },
     contact: {
-      email: 'iibrahiiim.dev@gmail.com',
+      support: 'iibrahiim.dev@gmail.com',
       website: 'https://iibrahim-dev.netlify.app/',
     },
   };
@@ -28,13 +32,11 @@ app.get('/', (req: Request, res: Response) => {
   res.json(serverStatus);
 });
 
-// application routes
+// Application routes under the '/api/v1' path
 app.use('/api/v1', router);
 
-// global error handler
-app.use(globalErrorHandler);
-
-// not found route
-app.use(notFound);
+// Error-handling middlewares
+app.use(globalErrorHandler); // Global error handler middleware
+app.use(notFound); // Middleware to handle 404 - Not Found errors
 
 export default app;
