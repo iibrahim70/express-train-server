@@ -79,7 +79,7 @@ pnpm start:dev
 - _GET /api/v1/stations/:stationId_: Retrieve station information.
 
 - _POST /api/v1/stations/create-station_: Create a new station.
-- _PATCH /api/v1/stations/:stationId_: Update station information.
+- _PATCH /api/v1/stations/update-station/:stationId_: Update station information.
 
 ### Train Management
 
@@ -87,7 +87,7 @@ pnpm start:dev
 - _GET /api/v1/trains/:trainId_: Retrieve train schedule information.
 
 - _POST /api/v1/trains/create-train_: Create a new train schedule.
-- _PATCH /api/v1/trains/:trainId_: Update train schedule information.
+- _PATCH /api/v1/trains/update-train:trainId_: Update train schedule information.
 
 ### Wallet Integration
 
