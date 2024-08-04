@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import ApiError from '../../errors/ApiError';
 import { ITrain } from './train.interface';
 import { Train } from './train.model';
+import { Station } from '../Station/station.model';
 
 const createTrainFromDB = async (payload: ITrain) => {
   // Check if a train with the provided trainCode already exists
@@ -10,7 +11,29 @@ const createTrainFromDB = async (payload: ITrain) => {
     throw new ApiError(httpStatus.CONFLICT, 'Train already exists!');
   }
 
-  // If train does not exist, create the new train
+  // Check for duplicate station codes in the schedule
+  const stationCodes = payload.schedule.map((schedule) => schedule.stationCode);
+  const uniqueStationCodes = new Set(stationCodes);
+  if (stationCodes.length !== uniqueStationCodes.size) {
+    // If there are duplicates, throw a BAD_REQUEST ApiError
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'Duplicate station codes found in the schedule!',
+    );
+  }
+
+  // Validate if all station codes in the train's schedule exist
+  for (const schedule of payload.schedule) {
+    if (!(await Station.isStationExistsByStationCode(schedule.stationCode))) {
+      // If any station does not exist, throw a NOT_FOUND ApiError
+      throw new ApiError(
+        httpStatus.NOT_FOUND,
+        `Station with code ${schedule.stationCode} does not exist!`,
+      );
+    }
+  }
+
+  // If train does not exist and all station codes are valid, create the new train
   const result = await Train.create(payload);
   return result;
 };
@@ -32,6 +55,29 @@ const getSingleTrainFromDB = async (trainId: string) => {
 };
 
 const updateTrainFromDB = async (trainId: string, payload: ITrain) => {
+  // Check for duplicate station codes in the schedule
+  const stationCodes = payload.schedule.map((schedule) => schedule.stationCode);
+  const uniqueStationCodes = new Set(stationCodes);
+  if (stationCodes.length !== uniqueStationCodes.size) {
+    // If there are duplicates, throw a BAD_REQUEST ApiError
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'Duplicate station codes found in the schedule!',
+    );
+  }
+
+  // Validate if all station codes in the train's schedule exist
+  for (const schedule of payload.schedule) {
+    if (!(await Station.isStationExistsByStationCode(schedule.stationCode))) {
+      // If any station does not exist, throw a NOT_FOUND ApiError
+      throw new ApiError(
+        httpStatus.NOT_FOUND,
+        `Station with code ${schedule.stationCode} does not exist!`,
+      );
+    }
+  }
+
+  // Update the train with the provided payload
   const result = await Train.findByIdAndUpdate(trainId, payload, {
     new: true,
   });
