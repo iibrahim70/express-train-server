@@ -6,7 +6,6 @@ export interface IUser {
   phoneNumber: string;
   avatar: string;
   password: string;
-  wallet: number;
   role: 'user' | 'admin';
   isDeleted: boolean;
   isBlocked: boolean;

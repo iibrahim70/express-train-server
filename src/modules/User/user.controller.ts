@@ -3,8 +3,8 @@ import catchAsync from '../../helpers/catchAsync';
 import sendResponse from '../../helpers/sendResponse';
 import { UserServices } from './user.service';
 
-const createUser = catchAsync(async (req, res) => {
-  const result = await UserServices.createUserFromDB(req.body);
+const registerUser = catchAsync(async (req, res) => {
+  const result = await UserServices.registerUserFromDB(req.body);
 
   return sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -26,6 +26,6 @@ const loginUser = catchAsync(async (req, res) => {
 });
 
 export const UserControllers = {
-  createUser,
+  registerUser,
   loginUser,
 };

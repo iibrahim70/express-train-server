@@ -28,11 +28,6 @@ const userSchema = new Schema<IUser, UserModel>(
       required: true,
       select: 0,
     },
-    wallet: {
-      type: Number,
-      required: true,
-      default: 150,
-    },
     role: {
       type: String,
       enum: ['user', 'admin'],
