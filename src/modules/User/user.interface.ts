@@ -1,4 +1,5 @@
 import { Model } from 'mongoose';
+import { USER_ROLE } from './user.constant';
 
 export interface IUser {
   fullName: string;
@@ -11,6 +12,8 @@ export interface IUser {
   isBlocked: boolean;
   status: 'in-progress' | 'blocked';
 }
+
+export type TUserRole = keyof typeof USER_ROLE;
 
 // for creating a static
 export interface UserModel extends Model<IUser> {
