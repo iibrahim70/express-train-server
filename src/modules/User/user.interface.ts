@@ -11,6 +11,7 @@ export interface IUser {
   isDeleted: boolean;
   isBlocked: boolean;
   status: 'in-progress' | 'blocked';
+  _id: ObjectId;
 }
 
 export type TUserRole = keyof typeof USER_ROLE;

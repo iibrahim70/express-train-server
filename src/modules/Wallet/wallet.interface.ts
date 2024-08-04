@@ -1,17 +1,13 @@
-import { Document, Model, ObjectId } from 'mongoose';
+import { Document, ObjectId } from 'mongoose';
 
 export interface ITransaction {
   amount: number;
   date: Date;
-  type: 'credit' | 'debit';
+  type: 'credit';
 }
 
 export interface IWallet extends Document {
   userId: ObjectId;
   balance: number;
   transactions: ITransaction[];
-}
-
-export interface WalletModel extends Model<IWallet> {
-  addFunds(userId: string, amount: number): Promise<IWallet>;
 }

@@ -5,6 +5,7 @@ import { User } from './user.model';
 import bcrypt from 'bcrypt';
 import config from '../../config';
 import { createToken } from '../../helpers/jwt';
+import { Wallet } from '../Wallet/wallet.model';
 
 const registerUserFromDB = async (payload: IUser) => {
   // Check if a user with the provided email already exists
@@ -22,9 +23,22 @@ const registerUserFromDB = async (payload: IUser) => {
     isDeleted: false, // Set default deleted status
   };
 
-  // If user does not exist, create the new user
-  const result = User.create(userPayload);
-  return result;
+  // Create the new user
+  const newUser = await User.create(userPayload);
+
+  // Create wallet for the newly registered user
+  const walletPayload = {
+    userId: newUser._id, // Reference to the new user's ID
+    balance: 50, // Initialize balance to 50
+    transactions: [], // Initialize with an empty transactions array
+  };
+
+  const newWallet = await Wallet.create(walletPayload);
+
+  return {
+    user: newUser,
+    wallet: newWallet,
+  };
 };
 
 const loginUserFromDB = async (payload: Partial<IUser>) => {

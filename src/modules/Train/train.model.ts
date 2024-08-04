@@ -2,23 +2,20 @@ import { Schema, model } from 'mongoose';
 import { ITrain, ITrainSchedule, TrainModel } from './train.interface';
 
 // Define the schema for the TrainSchedule subdocument
-const trainScheduleSchema = new Schema<ITrainSchedule>(
-  {
-    stationCode: {
-      type: String,
-      required: true,
-    },
-    arrivalTime: {
-      type: Date,
-      required: true,
-    },
-    departureTime: {
-      type: Date,
-      required: true,
-    },
+const trainScheduleSchema = new Schema<ITrainSchedule>({
+  stationCode: {
+    type: String,
+    required: true,
   },
-  { _id: false } // Prevent Mongoose from creating an _id field for sub documents
-);
+  arrivalTime: {
+    type: Date,
+    required: true,
+  },
+  departureTime: {
+    type: Date,
+    required: true,
+  },
+});
 
 // Define the schema for the Train model
 const trainSchema = new Schema<ITrain, TrainModel>(

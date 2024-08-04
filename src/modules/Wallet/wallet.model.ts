@@ -1,31 +1,27 @@
 import { Schema, model } from 'mongoose';
-import { ITransaction, IWallet, WalletModel } from './wallet.interface';
+import { ITransaction, IWallet } from './wallet.interface';
 
-const transactionSchema = new Schema<ITransaction>(
-  {
-    amount: {
-      type: Number,
-      required: true,
-    },
-    date: {
-      type: Date,
-      default: Date.now,
-    },
-    type: {
-      type: String,
-      enum: ['credit', 'debit'],
-      required: true,
-    },
+const transactionSchema = new Schema<ITransaction>({
+  amount: {
+    type: Number,
+    required: true,
   },
-  { _id: false }
-);
+  date: {
+    type: Date,
+    default: Date.now,
+  },
+  type: {
+    type: String,
+    default: 'credit',
+  },
+});
 
-const walletSchema = new Schema<IWallet, WalletModel>(
+const walletSchema = new Schema<IWallet>(
   {
     userId: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: 'User',
       required: true,
-      unique: true,
     },
     balance: {
       type: Number,
@@ -37,18 +33,7 @@ const walletSchema = new Schema<IWallet, WalletModel>(
       default: [],
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-walletSchema.statics.addFunds = async function (userId: string, amount: number) {
-  const wallet = await this.findOne({ userId });
-  if (!wallet) {
-    throw new Error('Wallet not found');
-  }
-  wallet.balance += amount;
-  wallet.transactions.push({ amount, date: new Date(), type: 'credit' });
-  await wallet.save();
-  return wallet;
-};
-
-export const Wallet = model<IWallet, WalletModel>('Wallet', walletSchema);
+export const Wallet = model<IWallet>('Wallet', walletSchema);
