@@ -4,7 +4,7 @@ import sendResponse from '../../helpers/sendResponse';
 import { TrainServices } from './train.service';
 
 const createTrain = catchAsync(async (req, res) => {
-  const result = await TrainServices.createTrainFromDB(req.body);
+  const result = await TrainServices.createTrainFromDB(req?.user, req.body);
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,

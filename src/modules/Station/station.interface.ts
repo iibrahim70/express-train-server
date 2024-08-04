@@ -4,6 +4,7 @@ export interface IStation {
   stationName: string;
   stationCode: string;
   location: string;
+  createdBy: ObjectId;
 }
 
 // for creating a static

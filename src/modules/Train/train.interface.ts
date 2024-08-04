@@ -1,9 +1,10 @@
-import {  Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 
 export interface ITrain {
   trainName: string;
   trainCode: string;
   schedule: ITrainSchedule[];
+  createdBy: ObjectId;
 }
 
 export interface ITrainSchedule {

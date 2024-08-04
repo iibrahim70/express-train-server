@@ -4,7 +4,10 @@ import sendResponse from '../../helpers/sendResponse';
 import { StationServices } from './station.service';
 
 const createStation = catchAsync(async (req, res) => {
-  const result = await StationServices.createStationFromDB(req?.body);
+  const result = await StationServices.createStationFromDB(
+    req?.user,
+    req?.body,
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,

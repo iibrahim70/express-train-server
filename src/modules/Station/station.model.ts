@@ -17,6 +17,11 @@ const stationSchema = new Schema<IStation, StationModel>(
       required: true,
       unique: true,
     },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
   },
   { timestamps: true }, // Adds createdAt and updatedAt timestamps
 );

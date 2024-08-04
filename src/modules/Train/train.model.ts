@@ -33,6 +33,11 @@ const trainSchema = new Schema<ITrain, TrainModel>(
       type: [trainScheduleSchema],
       required: true,
     },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
   },
   { timestamps: true }, // Adds createdAt and updatedAt timestamps
 );

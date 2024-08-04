@@ -3,8 +3,17 @@ import ApiError from '../../errors/ApiError';
 import { ITrain } from './train.interface';
 import { Train } from './train.model';
 import { Station } from '../Station/station.model';
+import { User } from '../User/user.model';
+import { JwtPayload } from 'jsonwebtoken';
 
-const createTrainFromDB = async (payload: ITrain) => {
+const createTrainFromDB = async (user: JwtPayload, payload: ITrain) => {
+  // Find the user by email
+  const existingUser = await User.isUserExistsByEmail(user.email);
+
+  if (!existingUser) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found for this email!');
+  }
+
   // Check if a train with the provided trainCode already exists
   if (await Train.isTrainExistsByTrainCode(payload.trainCode)) {
     // If train already exists, throw a CONFLICT ApiError
@@ -33,8 +42,14 @@ const createTrainFromDB = async (payload: ITrain) => {
     }
   }
 
+  // Add the userId to the payload
+  const trainPayload = {
+    ...payload,
+    createdBy: existingUser._id, // Add the userId to the payload
+  };
+
   // If train does not exist and all station codes are valid, create the new train
-  const result = await Train.create(payload);
+  const result = await Train.create(trainPayload);
   return result;
 };
 
