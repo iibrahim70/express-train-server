@@ -91,12 +91,12 @@ pnpm start:dev
 
 ### Wallet Integration
 
-- _POST /api/wallets/add-funds_: Add funds to the user's wallet.
-- _GET /api/wallets/balance_: Retrieve the user's wallet balance.
+- _GET /api/v1/wallets_: Retrieve the user's wallet balance.
+- _POST /api/v1/wallets/add-funds_: Add funds to the user's wallet.
 
 ### Ticketing System
 
-- _POST /api/tickets/purchase_: Purchase a ticket using wallet balance.
+- _POST /api/v1/tickets/purchase_: Purchase a ticket using wallet balance.
 
 ## Code Quality
 

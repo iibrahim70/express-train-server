@@ -4,7 +4,8 @@ import { ITrain, ITrainSchedule, TrainModel } from './train.interface';
 // Define the schema for the TrainSchedule subdocument
 const trainScheduleSchema = new Schema<ITrainSchedule>({
   stationCode: {
-    type: String,
+    type: Schema.Types.ObjectId,
+    ref: 'Station',
     required: true,
   },
   arrivalTime: {
@@ -31,11 +32,6 @@ const trainSchema = new Schema<ITrain, TrainModel>(
     },
     schedule: {
       type: [trainScheduleSchema],
-      required: true,
-    },
-    createdBy: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
       required: true,
     },
   },

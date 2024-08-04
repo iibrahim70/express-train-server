@@ -8,7 +8,7 @@ export interface ITrain {
 }
 
 export interface ITrainSchedule {
-  stationCode: string;
+  stationCode: ObjectId;
   arrivalTime: Date;
   departureTime: Date;
 }

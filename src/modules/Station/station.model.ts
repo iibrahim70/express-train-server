@@ -15,7 +15,6 @@ const stationSchema = new Schema<IStation, StationModel>(
     stationCode: {
       type: String,
       required: true,
-      unique: true,
     },
     createdBy: {
       type: Schema.Types.ObjectId,

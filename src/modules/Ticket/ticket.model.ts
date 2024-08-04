@@ -1,16 +1,19 @@
-import { Schema, model } from 'mongoose';
+import { model, Schema } from 'mongoose';
 import { ITicket, TicketModel } from './ticket.interface';
 import { Train } from '../Train/train.model';
 import { Wallet } from '../Wallet/wallet.model';
 
+// Define the schema for the Ticket model
 const ticketSchema = new Schema<ITicket, TicketModel>(
   {
     userId: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: 'User',
       required: true,
     },
     trainId: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: 'Train',
       required: true,
     },
     fromStation: {
@@ -22,22 +25,19 @@ const ticketSchema = new Schema<ITicket, TicketModel>(
       required: true,
     },
     fare: {
-      type: Number,
+      type: Number, // Fare in cents to avoid floating-point precision issues
       required: true,
     },
-    purchaseDate: {
-      type: Date,
-      default: Date.now,
-    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
+// Static method to purchase a ticket
 ticketSchema.statics.purchaseTicket = async function (
   userId: string,
   trainId: string,
   fromStation: string,
-  toStation: string
+  toStation: string,
 ) {
   const train = await Train.findById(trainId);
   if (!train) {
@@ -45,7 +45,7 @@ ticketSchema.statics.purchaseTicket = async function (
   }
 
   // Calculate fare based on train stops (for simplicity, assuming a flat rate)
-  const fare = 50; // Example flat fare
+  const fare = 50; // Example flat fare in cents
 
   const wallet = await Wallet.findOne({ userId });
   if (!wallet || wallet.balance < fare) {
@@ -53,11 +53,23 @@ ticketSchema.statics.purchaseTicket = async function (
   }
 
   wallet.balance -= fare;
-  wallet.transactions.push({ amount: -fare, date: new Date(), type: 'debit' });
+  wallet.transactions.push({
+    amount: -fare,
+    date: new Date(),
+    type: 'credit',
+  });
   await wallet.save();
 
-  const ticket = await this.create({ userId, trainId, fromStation, toStation, fare });
+  const ticket = await this.create({
+    userId,
+    trainId,
+    fromStation,
+    toStation,
+    fare,
+  });
+
   return ticket;
 };
 
+// Create the Ticket model using the schema
 export const Ticket = model<ITicket, TicketModel>('Ticket', ticketSchema);

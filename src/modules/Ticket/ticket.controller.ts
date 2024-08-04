@@ -4,8 +4,7 @@ import sendResponse from '../../helpers/sendResponse';
 import { TicketServices } from './ticket.service';
 
 const purchaseTicket = catchAsync(async (req, res) => {
-  const { userId, trainId, fromStation, toStation } = req.body;
-  const result = await TicketServices.purchaseTicket(userId, trainId, fromStation, toStation);
+  const result = await TicketServices.purchaseTicket(req?.user, req?.body);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
