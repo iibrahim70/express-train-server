@@ -4,7 +4,7 @@ import ApiError from '../../errors/ApiError';
 import { User } from './user.model';
 import bcrypt from 'bcrypt';
 import config from '../../config';
-import { createToken } from '../../helpers/auth.utils';
+import { createToken } from '../../helpers/auth';
 
 const registerUserFromDB = async (payload: IUser) => {
   // Check if a user with the provided email already exists
