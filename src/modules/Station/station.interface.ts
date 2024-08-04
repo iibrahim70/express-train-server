@@ -2,8 +2,8 @@ import { Model } from 'mongoose';
 
 export interface IStation {
   stationName: string;
-  location: string;
   stationCode: string;
+  location: string;
 }
 
 // for creating a static
