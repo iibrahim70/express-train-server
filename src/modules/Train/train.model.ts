@@ -1,11 +1,10 @@
 import { Schema, model } from 'mongoose';
-import { ITrain, ITrainSchedule, TrainModel } from './train.interface';
+import { IStop, ITrain, TrainModel } from './train.interface';
 
 // Define the schema for the TrainSchedule subdocument
-const trainScheduleSchema = new Schema<ITrainSchedule>({
+const trainStopSchema = new Schema<IStop>({
   stationCode: {
-    type: Schema.Types.ObjectId,
-    ref: 'Station',
+    type: String,
     required: true,
   },
   arrivalTime: {
@@ -30,8 +29,8 @@ const trainSchema = new Schema<ITrain, TrainModel>(
       required: true,
       unique: true,
     },
-    schedule: {
-      type: [trainScheduleSchema],
+    stops: {
+      type: [trainStopSchema],
       required: true,
     },
   },

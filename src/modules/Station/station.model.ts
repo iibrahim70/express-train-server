@@ -27,7 +27,7 @@ const stationSchema = new Schema<IStation, StationModel>(
 
 // Static method to check if a station with the given code exists
 stationSchema.statics.isStationExistsByStationCode = async function (
-  stationCode: number,
+  stationCode: string,
 ) {
   // Check for a station with the specified stationCode
   const existingStation = await Station.findOne({ stationCode });

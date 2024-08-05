@@ -3,12 +3,12 @@ import { Model, ObjectId } from 'mongoose';
 export interface ITrain {
   trainName: string;
   trainCode: string;
-  schedule: ITrainSchedule[];
+  stops: IStop[];
   createdBy: ObjectId;
 }
 
-export interface ITrainSchedule {
-  stationCode: ObjectId;
+export interface IStop {
+  stationCode: string;
   arrivalTime: Date;
   departureTime: Date;
 }
