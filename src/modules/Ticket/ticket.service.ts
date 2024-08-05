@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import httpStatus from 'http-status';
 import ApiError from '../../errors/ApiError';
 import { JwtPayload } from 'jsonwebtoken';
@@ -48,52 +49,65 @@ const calculateTicketPriceFromDB = async (payload: ITicket) => {
 };
 
 const purchaseTicketFromDB = async (user: JwtPayload, payload: ITicket) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  // Find the user by email
-  const existingUser = await User.isUserExistsByEmail(user.email);
+  try {
+    // Find the user by email
+    const existingUser = await User.isUserExistsByEmail(user.email);
+    if (!existingUser) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'User not found for this email!');
+    }
 
-  if (!existingUser) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User not found for this email!');
+    // Calculate the ticket price
+    const { price } = await calculateTicketPriceFromDB(payload);
+
+    // Find wallet by userId
+    const wallet = await Wallet.findOne({ userId: existingUser._id }).session(session);
+    if (!wallet) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Wallet not found for this user!');
+    }
+
+    // Check if the wallet has sufficient balance
+    if (wallet.balance < price) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Insufficient funds!');
+    }
+
+    // Deduct funds from wallet balance
+    wallet.balance -= price;
+    wallet.transactions.push({
+      amount: -price, // Negative amount for deduction
+      date: new Date(),
+    });
+    await wallet.save({ session });
+
+    // Generate ticket number based on train name, code, year, and last two digits of user ID
+    const ticketNumber = generateTicketNumber(payload.fromStation, payload.toStation);
+
+    // Save ticket information
+    const ticketPayload = {
+      ...payload, // Assuming payload contains ticket details like event, seat, trainName, trainCode
+      userId: existingUser._id,
+      price,
+      purchaseDate: new Date(),
+      ticketNumber,
+    };
+
+    const result = await Ticket.create([ticketPayload], { session });
+
+    // Commit the transaction
+    await session.commitTransaction();
+    await session.endSession();
+
+    return result;
+  } catch (error) {
+    // Abort the transaction in case of an error
+    await session.abortTransaction();
+    await session.endSession();
+    
+    // Re-throw the error to be handled by the caller
+    throw error;
   }
-
-  // Calculate the ticket price
-  const { price } = await calculateTicketPriceFromDB(payload);
-
-  // Find wallet by userId
-  const wallet = await Wallet.findOne({ userId: existingUser._id });
-
-  if (!wallet) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Wallet not found for this user!');
-  }
-
-  // Check if the wallet has sufficient balance
-  if (wallet.balance < price) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Insufficient funds!');
-  }
-
-  // Deduct funds from wallet balance
-  wallet.balance -= price;
-  wallet.transactions.push({
-    amount: -price, // Negative amount for deduction
-    date: new Date(),
-  });
-  await wallet.save();
-
-  // Generate ticket number based on train name, code, year, and last two digits of user ID
-  const ticketNumber = generateTicketNumber( payload.fromStation, payload.toStation);
-
-  // Save ticket information
-  const ticketPayload = {
-    ...payload, // Assuming payload contains ticket details like event, seat, trainName, trainCode
-    userId: existingUser._id,
-    price,
-    purchaseDate: new Date(),
-    ticketNumber,
-  };
-
-  const result = await Ticket.create(ticketPayload);
-  return result;
-
 };
 
 export const TicketServices = {
