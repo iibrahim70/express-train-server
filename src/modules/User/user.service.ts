@@ -29,7 +29,7 @@ const registerUserFromDB = async (payload: IUser) => {
     };
 
     // Create the new user
-    const newUser = await User.create(userPayload);
+    const newUser = await User.create([userPayload], {session});
 
     // Create wallet for the newly registered user
     const walletPayload = {
@@ -43,7 +43,7 @@ const registerUserFromDB = async (payload: IUser) => {
       ], // Initialize with the first transaction
     };
 
-    const newWallet = await Wallet.create(walletPayload);
+    const newWallet = await Wallet.create([walletPayload], {session});
 
     // Commit the transaction
     await session.commitTransaction();
