@@ -1,19 +1,10 @@
-import { Model, ObjectId } from 'mongoose';
+import { ObjectId } from 'mongoose';
 
 export interface ITicket {
   userId: ObjectId;
   trainId: ObjectId;
   fromStation: string;
   toStation: string;
-  fare: number;
+  price: number;
   purchaseDate: Date;
-}
-
-export interface TicketModel extends Model<ITicket> {
-  purchaseTicket(
-    userId: ObjectId,
-    trainId: ObjectId,
-    fromStation: string,
-    toStation: string,
-  ): Promise<ITicket>;
 }

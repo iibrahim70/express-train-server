@@ -5,6 +5,8 @@ import { USER_ROLE } from '../User/user.constant';
 
 const router = Router();
 
+router.post('/calculate-price', TicketControllers.calculateTicketPrice);
+
 router.post(
   '/purchase',
   validateAuth(USER_ROLE.admin, USER_ROLE.user),

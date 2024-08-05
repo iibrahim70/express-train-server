@@ -1,12 +1,51 @@
 import httpStatus from 'http-status';
 import ApiError from '../../errors/ApiError';
-import { Ticket } from './ticket.model';
 import { JwtPayload } from 'jsonwebtoken';
 import { ITicket } from './ticket.interface';
 import { User } from '../User/user.model';
 import { Train } from '../Train/train.model';
+import { Wallet } from '../Wallet/wallet.model';
 
-const purchaseTicket = async (user: JwtPayload, payload: ITicket) => {
+const FARE_PER_STATION = 50;
+
+const calculateTicketPriceFromDB = async (payload: ITicket) => {
+  // Check if the train exists
+  const train = await Train.findById(payload.trainId);
+
+  if (!train) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Train not found!');
+  }
+
+  // Ensure the provided stations are part of the train's route
+  const stops = train.stops; // Array of stop objects
+
+  // Extract station codes from stops
+  const stationCodes = stops.map((stop) => stop.stationCode);
+
+  const fromIndex = stationCodes.indexOf(payload.fromStation);
+  const toIndex = stationCodes.indexOf(payload.toStation);
+
+  if (fromIndex === -1 || toIndex === -1) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid stations provided.');
+  }
+
+  if (fromIndex >= toIndex) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'The "fromStation" must be before the "toStation".',
+    );
+  }
+
+  // Calculate the number of stations between fromStation and toStation
+  const numberOfStations = toIndex - fromIndex;
+
+  // Calculate the price
+  const price = numberOfStations * FARE_PER_STATION;
+
+  return { price };
+};
+
+const purchaseTicketFromDB = async (user: JwtPayload, payload: ITicket) => {
   // Find the user by email
   const existingUser = await User.isUserExistsByEmail(user.email);
 
@@ -14,30 +53,23 @@ const purchaseTicket = async (user: JwtPayload, payload: ITicket) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found for this email!');
   }
 
-  // Check if the train exists
-  const train = await Train.findById(payload.trainId);
-  if (!train) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Train not found!');
+  // Calculate the ticket price
+  const price = await calculateTicketPriceFromDB(payload);
+
+  // Find wallet by userId
+  const wallet = await Wallet.findOne({ userId: existingUser._id });
+
+  if (!wallet) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Wallet not found for this user!');
   }
 
-  // Purchase the ticket using the static method from Ticket model
-  const ticket = await Ticket.purchaseTicket(
-    user.id,
-    payload.trainId,
-    payload.fromStation,
-    payload.toStation,
-  );
-
-  if (!ticket) {
-    throw new ApiError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      'Ticket purchase failed',
-    );
+  // Check if the wallet has sufficient balance
+  if (wallet.balance < price) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Insufficient funds!');
   }
-
-  return ticket;
 };
 
 export const TicketServices = {
-  purchaseTicket,
+  calculateTicketPriceFromDB,
+  purchaseTicketFromDB,
 };
