@@ -4,7 +4,7 @@ import ApiError from '../../errors/ApiError';
 import { User } from './user.model';
 import bcrypt from 'bcrypt';
 import config from '../../config';
-import { createToken } from '../../helpers/jwt';
+import createToken from '../../helpers/createToken';
 import { Wallet } from '../Wallet/wallet.model';
 
 const registerUserFromDB = async (payload: IUser) => {
