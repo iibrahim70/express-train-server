@@ -5,7 +5,7 @@ import config from './config';
 async function main() {
   try {
     const connectionInstance = await mongoose.connect(
-      `${config.dbURL}/${config.dbName}`,
+      `${config.dbURL}/${config.collectionName}`,
     );
 
     console.log(
