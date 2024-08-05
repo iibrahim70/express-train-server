@@ -5,6 +5,8 @@ import { ITicket } from './ticket.interface';
 import { User } from '../User/user.model';
 import { Train } from '../Train/train.model';
 import { Wallet } from '../Wallet/wallet.model';
+import { generateTicketNumber } from '../../helpers/generateTicketNumber';
+import { Ticket } from './ticket.model';
 
 const FARE_PER_STATION = 50;
 
@@ -46,6 +48,7 @@ const calculateTicketPriceFromDB = async (payload: ITicket) => {
 };
 
 const purchaseTicketFromDB = async (user: JwtPayload, payload: ITicket) => {
+
   // Find the user by email
   const existingUser = await User.isUserExistsByEmail(user.email);
 
@@ -76,9 +79,21 @@ const purchaseTicketFromDB = async (user: JwtPayload, payload: ITicket) => {
   });
   await wallet.save();
 
-  return {
+  // Generate ticket number based on train name, code, year, and last two digits of user ID
+  const ticketNumber = generateTicketNumber( payload.fromStation, payload.toStation);
+
+  // Save ticket information
+  const ticketPayload = {
+    ...payload, // Assuming payload contains ticket details like event, seat, trainName, trainCode
+    userId: existingUser._id,
     price,
+    purchaseDate: new Date(),
+    ticketNumber,
   };
+
+  const result = await Ticket.create(ticketPayload);
+  return result;
+
 };
 
 export const TicketServices = {
