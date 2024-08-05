@@ -4,41 +4,63 @@ import ApiError from '../../errors/ApiError';
 import { User } from './user.model';
 import bcrypt from 'bcrypt';
 import config from '../../config';
-import createToken from '../../helpers/createToken';
 import { Wallet } from '../Wallet/wallet.model';
+import createToken from '../../helpers/createToken';
+import mongoose from 'mongoose';
 
 const registerUserFromDB = async (payload: IUser) => {
-  // Check if a user with the provided email already exists
-  if (await User.isUserExistsByEmail(payload?.email)) {
-    // If user already exists, throw a CONFLICT ApiError
-    throw new ApiError(httpStatus.CONFLICT, 'User already exists!');
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // Check if a user with the provided email already exists
+    if (await User.isUserExistsByEmail(payload?.email)) {
+      // If user already exists, throw a CONFLICT ApiError
+      throw new ApiError(httpStatus.CONFLICT, 'User already exists!');
+    }
+
+    // Create userPayload with default values for certain fields
+    const userPayload: IUser = {
+      ...payload,
+      role: 'user', // Set default role
+      status: 'in-progress', // Set default status
+      isBlocked: false, // Set default blocked status
+      isDeleted: false, // Set default deleted status
+    };
+
+    // Create the new user
+    const newUser = await User.create(userPayload);
+
+    // Create wallet for the newly registered user
+    const walletPayload = {
+      userId: newUser._id, // Reference to the new user's ID
+      balance: 50, // Initialize balance to 50
+      transactions: [
+        {
+          amount: 50,
+          date: new Date(),
+        },
+      ], // Initialize with the first transaction
+    };
+
+    const newWallet = await Wallet.create(walletPayload);
+
+    // Commit the transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    return {
+      user: newUser,
+      wallet: newWallet,
+    };
+  } catch (error) {
+    // Abort the transaction in case of an error
+    await session.abortTransaction();
+    await session.endSession();
+
+    // Re-throw the error to be handled by the caller
+    throw error;
   }
-
-  // Create userPayload with default values for certain fields
-  const userPayload: IUser = {
-    ...payload,
-    role: 'user', // Set default role
-    status: 'in-progress', // Set default status
-    isBlocked: false, // Set default blocked status
-    isDeleted: false, // Set default deleted status
-  };
-
-  // Create the new user
-  const newUser = await User.create(userPayload);
-
-  // Create wallet for the newly registered user
-  const walletPayload = {
-    userId: newUser._id, // Reference to the new user's ID
-    balance: 50, // Initialize balance to 50
-    transactions: [], // Initialize with an empty transactions array
-  };
-
-  const newWallet = await Wallet.create(walletPayload);
-
-  return {
-    user: newUser,
-    wallet: newWallet,
-  };
 };
 
 const loginUserFromDB = async (payload: Partial<IUser>) => {
