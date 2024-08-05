@@ -1,17 +1,17 @@
 import { Model, ObjectId } from 'mongoose';
 import { USER_ROLE } from './user.constant';
+import { IWallet } from '../Wallet/wallet.interface';
 
 export interface IUser {
+  _id: ObjectId;
   fullName: string;
   email: string;
   phoneNumber: string;
-  avatar: string;
   password: string;
   role: 'user' | 'admin';
   isDeleted: boolean;
   isBlocked: boolean;
   status: 'in-progress' | 'blocked';
-  _id: ObjectId;
 }
 
 export type TUserRole = keyof typeof USER_ROLE;

@@ -42,7 +42,6 @@ const addFundsToWallet = async (user: JwtPayload, payload: number) => {
   wallet.transactions.push({
     amount: payload,
     date: new Date(),
-    type: 'credit',
   });
   await wallet.save();
   return wallet;

@@ -10,19 +10,10 @@ const transactionSchema = new Schema<ITransaction>({
     type: Date,
     default: Date.now,
   },
-  type: {
-    type: String,
-    default: 'credit',
-  },
 });
 
 const walletSchema = new Schema<IWallet>(
   {
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-    },
     balance: {
       type: Number,
       required: true,
