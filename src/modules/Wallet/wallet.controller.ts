@@ -4,7 +4,7 @@ import sendResponse from '../../helpers/sendResponse';
 import { WalletServices } from './wallet.service';
 
 const getWallet = catchAsync(async (req, res) => {
-  const result = await WalletServices.getWalletByUserId(req?.user);
+  const result = await WalletServices.getWalletByUserIdFromDB(req?.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -15,7 +15,7 @@ const getWallet = catchAsync(async (req, res) => {
 });
 
 const addFunds = catchAsync(async (req, res) => {
-  const result = await WalletServices.addFundsToWallet(
+  const result = await WalletServices.addFundsToWalletFromDB(
     req?.user,
     req?.body?.amount,
   );

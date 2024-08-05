@@ -54,7 +54,7 @@ const purchaseTicketFromDB = async (user: JwtPayload, payload: ITicket) => {
   }
 
   // Calculate the ticket price
-  const price = await calculateTicketPriceFromDB(payload);
+  const { price } = await calculateTicketPriceFromDB(payload);
 
   // Find wallet by userId
   const wallet = await Wallet.findOne({ userId: existingUser._id });
@@ -67,6 +67,18 @@ const purchaseTicketFromDB = async (user: JwtPayload, payload: ITicket) => {
   if (wallet.balance < price) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Insufficient funds!');
   }
+
+  // Deduct funds from wallet balance
+  wallet.balance -= price;
+  wallet.transactions.push({
+    amount: -price, // Negative amount for deduction
+    date: new Date(),
+  });
+  await wallet.save();
+
+  return {
+    price,
+  };
 };
 
 export const TicketServices = {

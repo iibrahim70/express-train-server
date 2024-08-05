@@ -4,7 +4,7 @@ import { Wallet } from './wallet.model';
 import { JwtPayload } from 'jsonwebtoken';
 import { User } from '../User/user.model';
 
-const getWalletByUserId = async (user: JwtPayload) => {
+const getWalletByUserIdFromDB = async (user: JwtPayload) => {
   // Find the user by email
   const existingUser = await User.isUserExistsByEmail(user.email);
 
@@ -22,7 +22,7 @@ const getWalletByUserId = async (user: JwtPayload) => {
   return wallet;
 };
 
-const addFundsToWallet = async (user: JwtPayload, payload: number) => {
+const addFundsToWalletFromDB = async (user: JwtPayload, payload: number) => {
   // Find the user by email
   const existingUser = await User.isUserExistsByEmail(user.email);
 
@@ -47,6 +47,6 @@ const addFundsToWallet = async (user: JwtPayload, payload: number) => {
 };
 
 export const WalletServices = {
-  getWalletByUserId,
-  addFundsToWallet,
+  getWalletByUserIdFromDB,
+  addFundsToWalletFromDB,
 };
