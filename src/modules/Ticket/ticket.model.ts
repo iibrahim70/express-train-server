@@ -26,6 +26,9 @@ const ticketSchema = new Schema<ITicket>(
       type: Number,
       default: 0,
     },
+    ticketNumber: {
+      type: String,
+    },
   },
   { timestamps: true },
 );
