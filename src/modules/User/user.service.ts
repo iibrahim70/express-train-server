@@ -47,7 +47,7 @@ const registerUserFromDB = async (payload: IUser) => {
 
     // Commit the transaction
     await session.commitTransaction();
-    session.endSession();
+    await session.endSession();
 
     return {
       user: newUser,
