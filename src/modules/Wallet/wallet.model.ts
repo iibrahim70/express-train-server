@@ -14,6 +14,11 @@ const transactionSchema = new Schema<ITransaction>({
 
 const walletSchema = new Schema<IWallet>(
   {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
     balance: {
       type: Number,
       required: true,

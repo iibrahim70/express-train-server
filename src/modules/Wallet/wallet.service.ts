@@ -13,7 +13,7 @@ const getWalletByUserId = async (user: JwtPayload) => {
   }
 
   // Find wallet by userId
-  const wallet = await Wallet.findOne({ userId: existingUser._id });
+  const wallet = await Wallet.findById(existingUser._id);
 
   if (!wallet) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Wallet not found for this user!');
@@ -23,7 +23,6 @@ const getWalletByUserId = async (user: JwtPayload) => {
 };
 
 const addFundsToWallet = async (user: JwtPayload, payload: number) => {
-  console.log(payload);
   // Find the user by email
   const existingUser = await User.isUserExistsByEmail(user.email);
 
@@ -32,7 +31,7 @@ const addFundsToWallet = async (user: JwtPayload, payload: number) => {
   }
 
   // Find wallet by userId
-  const wallet = await Wallet.findOne({ userId: existingUser._id });
+  const wallet = await Wallet.findById(existingUser._id);
 
   if (!wallet) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Wallet not found for this user!');
