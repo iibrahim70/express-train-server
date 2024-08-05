@@ -46,7 +46,7 @@ pnpm i
 ```bash
 NODE_ENV=development
 PORT=5000
-DATABASE_URL=yourMongoDbDatabaseUrl/ //forward_slash_is_required
+DATABASE_URL=yourMongoDbDatabaseUrl
 COLLECTION_NAME=yourCollectionName
 BCRYPT_SALT_ROUNDS=10
 JWT_ACCESS_SECRET=yourJwtAccessSecret
