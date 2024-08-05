@@ -51,6 +51,17 @@ const updateTrain = catchAsync(async (req, res) => {
   });
 });
 
+// Schedule the cron job to run every minute
+cron.schedule('* * * * *', async () => {
+  console.log('Running cron job to fetch all trains...');
+  try {
+    const trains = await TrainServices.getAllTrainsFromDB();
+    console.log('Fetched all trains:', trains);
+  } catch (error) {
+    console.error('Error during cron job:', error);
+  }
+});
+
 export const TrainControllers = {
   createTrain,
   getAllTrains,
