@@ -7,4 +7,5 @@ export interface ITicket {
   toStation: string;
   price: number;
   purchaseDate: Date;
+  ticketNumber: string;
 }
