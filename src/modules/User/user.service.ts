@@ -39,6 +39,8 @@ const registerUserFromDB = async (payload: IUser) => {
         {
           amount: 50,
           date: new Date(),
+          type: 'credit',
+          ref: 'New Account Bonus!',
         },
       ], // Initialize with the first transaction
     };
