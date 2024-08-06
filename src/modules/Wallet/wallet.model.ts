@@ -10,6 +10,14 @@ const transactionSchema = new Schema<ITransaction>({
     type: Date,
     default: Date.now,
   },
+   type: {
+      type: String,
+      enum: ['credit', 'debit'],
+      required: true,
+    },
+ref: {
+      type: String,
+    },
 });
 
 const walletSchema = new Schema<IWallet>(
