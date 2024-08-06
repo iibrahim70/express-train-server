@@ -10,14 +10,15 @@ import mongoose from 'mongoose';
 
 const registerUserFromDB = async (payload: IUser) => {
   const session = await mongoose.startSession();
-  session.startTransaction();
+
+  // Check if a user with the provided email already exists
+  if (await User.isUserExistsByEmail(payload?.email)) {
+    // If user already exists, throw a CONFLICT ApiError
+    throw new ApiError(httpStatus.CONFLICT, 'User already exists!');
+  }
 
   try {
-    // Check if a user with the provided email already exists
-    if (await User.isUserExistsByEmail(payload?.email)) {
-      // If user already exists, throw a CONFLICT ApiError
-      throw new ApiError(httpStatus.CONFLICT, 'User already exists!');
-    }
+    session.startTransaction();
 
     // Create userPayload with default values for certain fields
     const userPayload: IUser = {
@@ -29,11 +30,11 @@ const registerUserFromDB = async (payload: IUser) => {
     };
 
     // Create the new user
-    const newUser = await User.create([userPayload], {session});
+    const newUser = await User.create([userPayload], { session });
 
     // Create wallet for the newly registered user
     const walletPayload = {
-      userId: newUser._id, // Reference to the new user's ID
+      userId: newUser[0]._id, // Reference to the new user's ID
       balance: 50, // Initialize balance to 50
       transactions: [
         {
@@ -45,7 +46,7 @@ const registerUserFromDB = async (payload: IUser) => {
       ], // Initialize with the first transaction
     };
 
-    const newWallet = await Wallet.create([walletPayload], {session});
+    const newWallet = await Wallet.create([walletPayload], { session });
 
     // Commit the transaction
     await session.commitTransaction();
