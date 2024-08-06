@@ -78,6 +78,8 @@ const purchaseTicketFromDB = async (user: JwtPayload, payload: ITicket) => {
     wallet.transactions.push({
       amount: -price, // Negative amount for deduction
       date: new Date(),
+      type: 'credit',
+      ref: 'Ticket Purchased'
     });
     await wallet.save({ session });
 
