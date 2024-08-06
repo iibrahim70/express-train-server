@@ -1,6 +1,5 @@
 import { Model, ObjectId } from 'mongoose';
 import { USER_ROLE } from './user.constant';
-import { IWallet } from '../Wallet/wallet.interface';
 
 export interface IUser {
   _id: ObjectId;
