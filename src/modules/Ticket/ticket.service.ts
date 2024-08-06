@@ -50,28 +50,31 @@ const calculateTicketPriceFromDB = async (payload: ITicket) => {
 
 const purchaseTicketFromDB = async (user: JwtPayload, payload: ITicket) => {
   const session = await mongoose.startSession();
-  session.startTransaction();
+
+  // Find the user by email
+  const existingUser = await User.isUserExistsByEmail(user.email);
+  if (!existingUser) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found for this email!');
+  }
+
+  // Calculate the ticket price
+  const { price } = await calculateTicketPriceFromDB(payload);
+
+  // Find wallet by userId
+  const wallet = await Wallet.findOne({ userId: existingUser._id }).session(
+    session,
+  );
+  if (!wallet) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Wallet not found for this user!');
+  }
+
+  // Check if the wallet has sufficient balance
+  if (wallet.balance < price) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Insufficient funds!');
+  }
 
   try {
-    // Find the user by email
-    const existingUser = await User.isUserExistsByEmail(user.email);
-    if (!existingUser) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'User not found for this email!');
-    }
-
-    // Calculate the ticket price
-    const { price } = await calculateTicketPriceFromDB(payload);
-
-    // Find wallet by userId
-    const wallet = await Wallet.findOne({ userId: existingUser._id }).session(session);
-    if (!wallet) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'Wallet not found for this user!');
-    }
-
-    // Check if the wallet has sufficient balance
-    if (wallet.balance < price) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'Insufficient funds!');
-    }
+    session.startTransaction();
 
     // Deduct funds from wallet balance
     wallet.balance -= price;
@@ -79,12 +82,15 @@ const purchaseTicketFromDB = async (user: JwtPayload, payload: ITicket) => {
       amount: -price, // Negative amount for deduction
       date: new Date(),
       type: 'debit',
-      ref: 'Ticket Purchased'
+      ref: 'Ticket Purchased',
     });
     await wallet.save({ session });
 
     // Generate ticket number based on train name, code, year, and last two digits of user ID
-    const ticketNumber = generateTicketNumber(payload.fromStation, payload.toStation);
+    const ticketNumber = generateTicketNumber(
+      payload.fromStation,
+      payload.toStation,
+    );
 
     // Save ticket information
     const ticketPayload = {
@@ -106,7 +112,7 @@ const purchaseTicketFromDB = async (user: JwtPayload, payload: ITicket) => {
     // Abort the transaction in case of an error
     await session.abortTransaction();
     await session.endSession();
-    
+
     // Re-throw the error to be handled by the caller
     throw error;
   }
